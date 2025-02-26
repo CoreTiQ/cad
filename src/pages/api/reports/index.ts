@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           subject: true
         },
         orderBy: {
-          createdAt: 'desc'
+          created_at: 'desc' // تغيير createdAt إلى created_at
         }
       })
       
@@ -32,21 +32,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'POST') {
-    const { title, description, subjectId, charges } = req.body
+    const { title, description, subject_citizenid, charges } = req.body
 
-    if (!title || !description || !subjectId || !charges) {
+    if (!title || !description || !subject_citizenid || !charges) {
       return res.status(400).json({ error: 'Missing required fields' })
     }
 
     try {
-      const officerId = parseInt(session.user.id)
-      
       const report = await prisma.policeReport.create({
         data: {
           title,
           description,
-          officerId,
-          subjectId: parseInt(subjectId),
+          officer_citizenid: session.user.id, // تأكد من تطابق اسم الحقل
+          subject_citizenid: subject_citizenid,
           charges
         }
       })
