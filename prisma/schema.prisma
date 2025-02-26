@@ -7,65 +7,110 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id          Int          @id @default(autoincrement())
-  citizenid   String       @unique
-  firstname   String
-  lastname    String
-  job         String       @default("unemployed")
-  grade       Int          @default(0)
-  reports     Report[]     @relation("OfficerReports")
-  subject     Report[]     @relation("SubjectReports")
-  warrants    Warrant[]    @relation("OfficerWarrants")
-  wantedBy    Warrant[]    @relation("SubjectWarrants")
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+// ربط مع جدول players الموجود في QBCore
+model Player {
+  id            String          @id @map("citizenid")
+  license       String?
+  charinfo      Json?           // يحتوي على firstname و lastname وغيرها
+  job           Json?           // يحتوي على name و grade
+  money         Json?
+  metadata      Json?
+  position      String?         @db.Text
+  reports       PoliceReport[]  @relation("OfficerReports")
+  subjectReports PoliceReport[] @relation("SubjectReports")
+  warrants      PoliceWarrant[] @relation("OfficerWarrants")
+  subjectWarrants PoliceWarrant[] @relation("SubjectWarrants")
+  vehicles      PlayerVehicle[] // العلاقة مع المركبات في QBCore
+
+  @@map("players")
 }
 
-model Report {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String   @db.Text
-  officerId   Int
-  officer     User     @relation("OfficerReports", fields: [officerId], references: [id])
-  subjectId   Int
-  subject     User     @relation("SubjectReports", fields: [subjectId], references: [id])
-  charges     String   @db.Text
-  status      String   @default("active")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+// جدول تقارير الشرطة
+model PoliceReport {
+  id                Int      @id @default(autoincrement())
+  title             String
+  description       String   @db.Text
+  officer_citizenid String
+  officer           Player   @relation("OfficerReports", fields: [officer_citizenid], references: [id])
+  subject_citizenid String
+  subject           Player   @relation("SubjectReports", fields: [subject_citizenid], references: [id])
+  charges           String   @db.Text
+  status            String   @default("active")
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  @@map("police_reports")
 }
 
-model Warrant {
-  id          Int      @id @default(autoincrement())
-  reason      String
-  description String   @db.Text
-  officerId   Int
-  officer     User     @relation("OfficerWarrants", fields: [officerId], references: [id])
-  subjectId   Int
-  subject     User     @relation("SubjectWarrants", fields: [subjectId], references: [id])
-  status      String   @default("active")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  expiresAt   DateTime?
+// جدول أوامر القبض
+model PoliceWarrant {
+  id                Int       @id @default(autoincrement())
+  reason            String
+  description       String    @db.Text
+  officer_citizenid String
+  officer           Player    @relation("OfficerWarrants", fields: [officer_citizenid], references: [id])
+  subject_citizenid String
+  subject           Player    @relation("SubjectWarrants", fields: [subject_citizenid], references: [id])
+  status            String    @default("active")
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  expires_at        DateTime?
+
+  @@map("police_warrants")
 }
 
-model Vehicle {
-  id          Int      @id @default(autoincrement())
-  plate       String   @unique
-  model       String
-  citizenid   String
-  stolen      Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model Charge {
+// جدول المخالفات المتاحة
+model PoliceCharge {
   id          Int      @id @default(autoincrement())
   name        String
-  description String
+  description String   @db.Text
   fine        Int
-  jailTime    Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  jail_time   Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("police_charges")
+}
+
+// جدول صلاحيات الوصول للنظام
+model PoliceCadAccess {
+  id         Int      @id @default(autoincrement())
+  job        String   @unique
+  min_grade  Int      @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("police_cad_access")
+}
+
+// ربط مع جدول المركبات في QBCore (للبحث عن المركبات)
+model PlayerVehicle {
+  id          Int       @id @default(autoincrement())
+  license     String?
+  citizenid   String
+  vehicle     String?
+  hash        String?
+  mods        String?   @db.Text
+  metadata    String?   @db.Text
+  state       Int?      @default(0)
+  player      Player    @relation(fields: [citizenid], references: [id])
+  plate       String?
+  garage      String?
+  fuel        Int?      @default(100)
+  engine      Float?    @default(1000.0)
+  body        Float?    @default(1000.0)
+  
+  @@map("player_vehicles")
+}
+
+// ربط مع جدول سجل الدخول إذا كنت تحتاج لتتبع تسجيلات الدخول
+model LoginLog {
+  id         Int      @id @default(autoincrement())
+  citizenid  String
+  time       DateTime @default(now())
+  ip_address String?
+  success    Boolean  @default(true)
+  reason     String?
+
+  @@map("police_login_logs")
 }
