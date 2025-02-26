@@ -23,25 +23,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const users = await prisma.player.findMany({
         where: {
           OR: [
-            { id: { contains: query } }, // استخدم id بدلاً من citizenid
-            { 
+            { id: { contains: query } },
+            // استخدام JSON contains للبحث
+            {
               charinfo: {
-                path: ['firstname'],
-                string_contains: query 
-              } 
-            },
-            { 
-              charinfo: {
-                path: ['lastname'],
-                string_contains: query 
-              } 
+                string_contains: query
+              }
             }
           ]
         },
         take: 10
       })
       
-      // تحويل المركبات إلى بيانات آمنة للإرسال
+      // معالجة البيانات JSON بشكل آمن
       const safeUsers = users.map(user => ({
         ...user,
         charinfo: user.charinfo ? JSON.parse(JSON.stringify(user.charinfo)) : null,
