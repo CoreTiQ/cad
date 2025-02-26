@@ -1,0 +1,8 @@
+{
+    "buildCommand": "npm run build",
+    "ignoreErrors": true,
+    "routes": [
+      { "handle": "filesystem" },
+      { "src": "/(.*)", "dest": "/" }
+    ]
+  }
