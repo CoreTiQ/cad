@@ -23,15 +23,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const users = await prisma.player.findMany({
         where: {
           OR: [
-            { citizenid: { contains: query } },
-            { firstname: { contains: query } },
-            { lastname: { contains: query } }
+            { id: { contains: query } }, // استخدم id بدلاً من citizenid
+            { 
+              charinfo: {
+                path: ['firstname'],
+                string_contains: query 
+              } 
+            },
+            { 
+              charinfo: {
+                path: ['lastname'],
+                string_contains: query 
+              } 
+            }
           ]
         },
         take: 10
       })
       
-      return res.status(200).json(users)
+      // تحويل المركبات إلى بيانات آمنة للإرسال
+      const safeUsers = users.map(user => ({
+        ...user,
+        charinfo: user.charinfo ? JSON.parse(JSON.stringify(user.charinfo)) : null,
+        job: user.job ? JSON.parse(JSON.stringify(user.job)) : null,
+        money: user.money ? JSON.parse(JSON.stringify(user.money)) : null,
+        metadata: user.metadata ? JSON.parse(JSON.stringify(user.metadata)) : null
+      }))
+      
+      return res.status(200).json(safeUsers)
     } catch (error) {
       console.error('Error searching users:', error)
       return res.status(500).json({ error: 'Internal Server Error' })
