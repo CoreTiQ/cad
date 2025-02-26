@@ -3,6 +3,9 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     domains: ['localhost']
+  },
+  webpack(config) {
+    return config;
   }
 }
 
