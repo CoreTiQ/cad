@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  citizenid   String       @unique
+  firstname   String
+  lastname    String
+  job         String       @default("unemployed")
+  grade       Int          @default(0)
+  reports     Report[]     @relation("OfficerReports")
+  subject     Report[]     @relation("SubjectReports")
+  warrants    Warrant[]    @relation("OfficerWarrants")
+  wantedBy    Warrant[]    @relation("SubjectWarrants")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Report {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String   @db.Text
+  officerId   Int
+  officer     User     @relation("OfficerReports", fields: [officerId], references: [id])
+  subjectId   Int
+  subject     User     @relation("SubjectReports", fields: [subjectId], references: [id])
+  charges     String   @db.Text
+  status      String   @default("active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Warrant {
+  id          Int      @id @default(autoincrement())
+  reason      String
+  description String   @db.Text
+  officerId   Int
+  officer     User     @relation("OfficerWarrants", fields: [officerId], references: [id])
+  subjectId   Int
+  subject     User     @relation("SubjectWarrants", fields: [subjectId], references: [id])
+  status      String   @default("active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  expiresAt   DateTime?
+}
+
+model Vehicle {
+  id          Int      @id @default(autoincrement())
+  plate       String   @unique
+  model       String
+  citizenid   String
+  stolen      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Charge {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  fine        Int
+  jailTime    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
