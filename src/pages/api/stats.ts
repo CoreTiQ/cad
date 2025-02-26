@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         prisma.policeReport.count(),
         prisma.policeWarrant.count(),
         prisma.player.count(),
-        prisma.playerVehicle.count() // تغيير PlayerVehicle إلى playerVehicle
+        prisma.playerVehicle.count()
       ])
       
       return res.status(200).json({

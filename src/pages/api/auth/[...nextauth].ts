@@ -1,8 +1,8 @@
-import NextAuth, { NextAuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { PrismaClient } from '@prisma/client';
+import NextAuth, { NextAuthOptions } from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -14,39 +14,33 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.citizenid || !credentials?.password) {
-          return null;
+          return null
         }
 
         try {
-          // البحث عن اللاعب باستخدام رقم الهوية
           const player = await prisma.player.findUnique({
             where: {
               id: credentials.citizenid
             }
-          });
+          })
 
           if (!player) {
-            return null;
+            return null
           }
 
-          // التحقق من الصلاحيات (هل هذا الشخص ضابط شرطة)
-          const job = player.job as any;
+          const job = player.job as any
           
           if (!job || job.name !== 'police') {
-            // إذا لم يكن الشخص ضابط شرطة، لا يمكنه الوصول إلى النظام
-            return null;
+            return null
           }
 
-          // استخدم كلمة مرور ثابتة للجميع (للاختبار فقط)
-          // في البيئة الإنتاجية يجب استخدام نظام أكثر أمانًا
-          const fixedPassword = process.env.POLICE_CAD_PASSWORD || "police123";
+          const fixedPassword = process.env.POLICE_CAD_PASSWORD || "police123"
           
           if (credentials.password !== fixedPassword) {
-            return null;
+            return null
           }
 
-          // استخراج معلومات اللاعب من الحقل charinfo (حقل JSON)
-          const charinfo = player.job ? (player.charinfo as any) : null;
+          const charinfo = player.charinfo as any
           
           return {
             id: player.id,
@@ -55,10 +49,10 @@ export const authOptions: NextAuthOptions = {
             grade: job ? job.grade : 0,
             citizenid: player.id,
             email: ""
-          };
+          }
         } catch (error) {
-          console.error('Auth error:', error);
-          return null;
+          console.error('Auth error:', error)
+          return null
         }
       }
     })
@@ -66,21 +60,21 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.citizenid = user.citizenid;
-        token.job = user.job;
-        token.grade = user.grade;
+        token.id = user.id
+        token.citizenid = user.citizenid
+        token.job = user.job
+        token.grade = user.grade
       }
-      return token;
+      return token
     },
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id as string;
-        session.user.citizenid = token.citizenid as string;
-        session.user.job = token.job as string;
-        session.user.grade = token.grade as number;
+        session.user.id = token.id as string
+        session.user.citizenid = token.citizenid as string
+        session.user.job = token.job as string
+        session.user.grade = token.grade as number
       }
-      return session;
+      return session
     }
   },
   pages: {
@@ -90,6 +84,6 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt'
   },
   secret: process.env.NEXTAUTH_SECRET
-};
+}
 
-export default NextAuth(authOptions);
+export default NextAuth(authOptions)

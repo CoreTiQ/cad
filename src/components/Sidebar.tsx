@@ -6,7 +6,6 @@ import {
   UserIcon,
   DocumentTextIcon,
   TruckIcon,
-  MagnifyingGlassIcon,
   DocumentDuplicateIcon,
   ClipboardDocumentCheckIcon
 } from '@heroicons/react/24/outline'

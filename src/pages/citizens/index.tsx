@@ -43,42 +43,46 @@ export default function Citizens() {
         <title>البحث عن مواطن - نظام الشرطة</title>
       </Head>
       <div className="space-y-6">
-        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">البحث عن مواطن</h2>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="flex">
-              <div className="relative flex-grow">
-                <input
-                  {...register('query', { required: 'الرجاء إدخال معلومات البحث' })}
-                  type="text"
-                  className="block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm"
-                  placeholder="ابحث برقم الهوية أو الاسم الأول أو الاسم الأخير"
-                />
-                {errors.query && (
-                  <p className="mt-2 text-sm text-red-600">{errors.query.message}</p>
-                )}
+        <div className="card">
+          <div className="card-header">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">البحث عن مواطن</h2>
+          </div>
+          <div className="card-body">
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="flex">
+                <div className="relative flex-grow">
+                  <input
+                    {...register('query', { required: 'الرجاء إدخال معلومات البحث' })}
+                    type="text"
+                    className="input"
+                    placeholder="ابحث برقم الهوية أو الاسم الأول أو الاسم الأخير"
+                  />
+                  {errors.query && (
+                    <p className="mt-2 text-sm text-red-600">{errors.query.message}</p>
+                  )}
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSearching}
+                  className="mr-2 btn btn-primary"
+                >
+                  {isSearching ? (
+                    'جاري البحث...'
+                  ) : (
+                    <>
+                      <MagnifyingGlassIcon className="h-4 w-4 ml-2" />
+                      بحث
+                    </>
+                  )}
+                </button>
               </div>
-              <button
-                type="submit"
-                disabled={isSearching}
-                className="mr-2 inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
-              >
-                {isSearching ? (
-                  'جاري البحث...'
-                ) : (
-                  <>
-                    <MagnifyingGlassIcon className="h-4 w-4 ml-2" />
-                    بحث
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
 
         {searchResults.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
-            <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="card">
+            <div className="card-header">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">نتائج البحث</h3>
             </div>
             <div className="overflow-x-auto">
@@ -113,7 +117,7 @@ export default function Citizens() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                         <button
-                          onClick={() => router.push(`/citizens/${citizen.id}`)}
+                          onClick={() => router.push(`/citizens/${citizen.citizenid}`)}
                           className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
                         >
                           عرض التفاصيل

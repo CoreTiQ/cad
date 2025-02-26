@@ -7,12 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ربط مع جدول players الموجود في QBCore
 model Player {
   id            String          @id @map("citizenid")
   license       String?
-  charinfo      Json?           // يحتوي على firstname و lastname وغيرها
-  job           Json?           // يحتوي على name و grade
+  charinfo      Json?
+  job           Json?
   money         Json?
   metadata      Json?
   position      String?         @db.Text
@@ -20,20 +19,19 @@ model Player {
   subjectReports PoliceReport[] @relation("SubjectReports")
   warrants      PoliceWarrant[] @relation("OfficerWarrants")
   subjectWarrants PoliceWarrant[] @relation("SubjectWarrants")
-  vehicles      PlayerVehicle[] // العلاقة مع المركبات في QBCore
+  vehicles      PlayerVehicle[]
 
   @@map("players")
 }
 
-// جدول تقارير الشرطة
 model PoliceReport {
   id                Int      @id @default(autoincrement())
   title             String
   description       String   @db.Text
   officer_citizenid String
-  officer           Player   @relation("OfficerReports", fields: [officer_citizenid], references: [id])
+  officer           Player   @relation("OfficerReports", fields: [officer_citizenid], references: [id], onDelete: NoAction, onUpdate: NoAction)
   subject_citizenid String
-  subject           Player   @relation("SubjectReports", fields: [subject_citizenid], references: [id])
+  subject           Player   @relation("SubjectReports", fields: [subject_citizenid], references: [id], onDelete: NoAction, onUpdate: NoAction)
   charges           String   @db.Text
   status            String   @default("active")
   created_at        DateTime @default(now())
@@ -42,15 +40,14 @@ model PoliceReport {
   @@map("police_reports")
 }
 
-// جدول أوامر القبض
 model PoliceWarrant {
   id                Int       @id @default(autoincrement())
   reason            String
   description       String    @db.Text
   officer_citizenid String
-  officer           Player    @relation("OfficerWarrants", fields: [officer_citizenid], references: [id])
+  officer           Player    @relation("OfficerWarrants", fields: [officer_citizenid], references: [id], onDelete: NoAction, onUpdate: NoAction)
   subject_citizenid String
-  subject           Player    @relation("SubjectWarrants", fields: [subject_citizenid], references: [id])
+  subject           Player    @relation("SubjectWarrants", fields: [subject_citizenid], references: [id], onDelete: NoAction, onUpdate: NoAction)
   status            String    @default("active")
   created_at        DateTime  @default(now())
   updated_at        DateTime  @updatedAt
@@ -59,7 +56,6 @@ model PoliceWarrant {
   @@map("police_warrants")
 }
 
-// جدول المخالفات المتاحة
 model PoliceCharge {
   id          Int      @id @default(autoincrement())
   name        String
@@ -72,7 +68,6 @@ model PoliceCharge {
   @@map("police_charges")
 }
 
-// جدول صلاحيات الوصول للنظام
 model PoliceCadAccess {
   id         Int      @id @default(autoincrement())
   job        String   @unique
@@ -83,7 +78,6 @@ model PoliceCadAccess {
   @@map("police_cad_access")
 }
 
-// ربط مع جدول المركبات في QBCore (للبحث عن المركبات)
 model PlayerVehicle {
   id          Int       @id @default(autoincrement())
   license     String?
@@ -93,7 +87,7 @@ model PlayerVehicle {
   mods        String?   @db.Text
   metadata    String?   @db.Text
   state       Int?      @default(0)
-  player      Player    @relation(fields: [citizenid], references: [id])
+  player      Player    @relation(fields: [citizenid], references: [id], onDelete: NoAction, onUpdate: NoAction)
   plate       String?
   garage      String?
   fuel        Int?      @default(100)
@@ -101,16 +95,4 @@ model PlayerVehicle {
   body        Float?    @default(1000.0)
   
   @@map("player_vehicles")
-}
-
-// ربط مع جدول سجل الدخول إذا كنت تحتاج لتتبع تسجيلات الدخول
-model LoginLog {
-  id         Int      @id @default(autoincrement())
-  citizenid  String
-  time       DateTime @default(now())
-  ip_address String?
-  success    Boolean  @default(true)
-  reason     String?
-
-  @@map("police_login_logs")
 }

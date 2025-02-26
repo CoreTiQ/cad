@@ -49,8 +49,8 @@ export default function Login() {
         </div>
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10">
-            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          <div className="card">
+            <form className="space-y-6 card-body" onSubmit={handleSubmit(onSubmit)}>
               <div>
                 <label htmlFor="citizenid" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   رقم الهوية
@@ -62,7 +62,7 @@ export default function Login() {
                     name="citizenid"
                     type="text"
                     autoComplete="off"
-                    className="block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm"
+                    className="input"
                   />
                   {errors.citizenid && (
                     <p className="mt-2 text-sm text-red-600">{errors.citizenid.message}</p>
@@ -81,7 +81,7 @@ export default function Login() {
                     name="password"
                     type="password"
                     autoComplete="current-password"
-                    className="block w-full appearance-none rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm"
+                    className="input"
                   />
                   {errors.password && (
                     <p className="mt-2 text-sm text-red-600">{errors.password.message}</p>
@@ -93,7 +93,7 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex w-full justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="btn btn-primary w-full"
                 >
                   {isLoading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
                 </button>

@@ -33,7 +33,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ error: 'Report not found' })
       }
       
-      return res.status(200).json(report)
+      const officerCharInfo = report.officer.charinfo as any
+      const subjectCharInfo = report.subject.charinfo as any
+      
+      const formattedReport = {
+        ...report,
+        officer: {
+          ...report.officer,
+          firstname: officerCharInfo?.firstname || '',
+          lastname: officerCharInfo?.lastname || ''
+        },
+        subject: {
+          ...report.subject,
+          firstname: subjectCharInfo?.firstname || '',
+          lastname: subjectCharInfo?.lastname || ''
+        }
+      }
+      
+      return res.status(200).json(formattedReport)
     } catch (error) {
       console.error('Error fetching report:', error)
       return res.status(500).json({ error: 'Internal Server Error' })

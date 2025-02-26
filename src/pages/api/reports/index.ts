@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
-import { PrismaClient, Prisma } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -14,17 +14,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'GET') {
     try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined
+      
       const reports = await prisma.policeReport.findMany({
         include: {
           officer: true,
           subject: true
         },
         orderBy: {
-          created_at: 'desc' // تغيير createdAt إلى created_at
+          created_at: 'desc'
+        },
+        ...(limit ? { take: limit } : {})
+      })
+      
+      const formattedReports = reports.map(report => {
+        const officerCharInfo = report.officer.charinfo as any
+        const subjectCharInfo = report.subject.charinfo as any
+        
+        return {
+          ...report,
+          officer: {
+            ...report.officer,
+            firstname: officerCharInfo?.firstname || '',
+            lastname: officerCharInfo?.lastname || ''
+          },
+          subject: {
+            ...report.subject,
+            firstname: subjectCharInfo?.firstname || '',
+            lastname: subjectCharInfo?.lastname || ''
+          }
         }
       })
       
-      return res.status(200).json(reports)
+      return res.status(200).json(formattedReports)
     } catch (error) {
       console.error('Error fetching reports:', error)
       return res.status(500).json({ error: 'Internal Server Error' })
@@ -39,12 +61,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
+      const officer_citizenid = session.user.citizenid
+      
       const report = await prisma.policeReport.create({
         data: {
           title,
           description,
-          officer_citizenid: session.user.id, // تأكد من تطابق اسم الحقل
-          subject_citizenid: subject_citizenid,
+          officer_citizenid,
+          subject_citizenid,
           charges
         }
       })
