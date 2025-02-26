@@ -1,4 +1,3 @@
-// En src/pages/api/auth/[...nextauth].ts
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaClient } from '@prisma/client';
@@ -19,7 +18,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          // Buscar al jugador por citizenid
+          // البحث عن اللاعب باستخدام رقم الهوية
           const player = await prisma.player.findUnique({
             where: {
               id: credentials.citizenid
@@ -30,29 +29,32 @@ export const authOptions: NextAuthOptions = {
             return null;
           }
 
-          // En QBCore normalmente no necesitas verificar la contraseña desde la base de datos
-          // ya que la autenticación se maneja a través del servidor FiveM
-          // Para este ejemplo, asumiré que la implementación se basa en el citizenid
-          // Puedes modificar esto según tu configuración específica
-
-          // Opción simplificada para CAD policial: usar una contraseña fija para todos los oficiales
-          // o usar un sistema de contraseñas específico para el CAD
-          const password = "police123"; // Puedes almacenar esto en una variable de entorno
+          // التحقق من الصلاحيات (هل هذا الشخص ضابط شرطة)
+          const job = player.job as any;
           
-          if (credentials.password !== password) {
+          if (!job || job.name !== 'police') {
+            // إذا لم يكن الشخص ضابط شرطة، لا يمكنه الوصول إلى النظام
             return null;
           }
 
-          // Extraer información del jugador desde charinfo (que es un campo JSON)
-          const charinfo = player.charinfo as any;
-          const job = player.job as any;
+          // استخدم كلمة مرور ثابتة للجميع (للاختبار فقط)
+          // في البيئة الإنتاجية يجب استخدام نظام أكثر أمانًا
+          const fixedPassword = process.env.POLICE_CAD_PASSWORD || "police123";
+          
+          if (credentials.password !== fixedPassword) {
+            return null;
+          }
+
+          // استخراج معلومات اللاعب من الحقل charinfo (حقل JSON)
+          const charinfo = player.job ? (player.charinfo as any) : null;
           
           return {
-            id: player.id.toString(),
-            citizenid: player.id,
-            name: charinfo ? `${charinfo.firstname} ${charinfo.lastname}` : "Officer",
+            id: player.id,
+            name: charinfo ? `${charinfo.firstname} ${charinfo.lastname}` : "الضابط",
             job: job ? job.name : "",
-            grade: job ? job.grade : 0
+            grade: job ? job.grade : 0,
+            citizenid: player.id,
+            email: ""
           };
         } catch (error) {
           console.error('Auth error:', error);
