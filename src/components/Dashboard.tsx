@@ -15,6 +15,28 @@ type StatsType = {
   totalVehicles: number
 }
 
+type ReportType = {
+  id: number;
+  title: string;
+  subject: {
+    firstname: string;
+    lastname: string;
+  };
+  created_at: string;
+  status: string;
+}
+
+type WarrantType = {
+  id: number;
+  reason: string;
+  subject: {
+    firstname: string;
+    lastname: string;
+  };
+  created_at: string;
+  status: string;
+}
+
 export default function Dashboard() {
   const { data: session } = useSession()
   const [stats, setStats] = useState<StatsType>({
@@ -23,8 +45,8 @@ export default function Dashboard() {
     totalCitizens: 0,
     totalVehicles: 0
   })
-  const [recentReports, setRecentReports] = useState([])
-  const [activeWarrants, setActiveWarrants] = useState([])
+  const [recentReports, setRecentReports] = useState<ReportType[]>([])
+  const [activeWarrants, setActiveWarrants] = useState<WarrantType[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -126,7 +148,7 @@ function StatCard({ title, value, icon, bgColor, textColor }: StatCardProps) {
   )
 }
 
-function RecentReportsCard({ reports }) {
+function RecentReportsCard({ reports }: { reports: ReportType[] }) {
   return (
     <div className="card">
       <div className="card-header">
@@ -161,7 +183,7 @@ function RecentReportsCard({ reports }) {
   )
 }
 
-function ActiveWarrantsCard({ warrants }) {
+function ActiveWarrantsCard({ warrants }: { warrants: WarrantType[] }) {
   return (
     <div className="card">
       <div className="card-header">
