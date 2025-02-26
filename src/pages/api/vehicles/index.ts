@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      const vehicle = await prisma.vehicle.findFirst({
+      const vehicle = await prisma.playerVehicle.findFirst({
         where: {
           plate: { contains: plate }
         }
