@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'GET') {
     try {
-      const report = await prisma.report.findUnique({
+      const report = await prisma.policeReport.findUnique({
         where: { id: reportId },
         include: {
           officer: true,
@@ -48,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      const report = await prisma.report.update({
+      const report = await prisma.policeReport.update({
         where: { id: reportId },
         data: {
           title,
@@ -67,7 +67,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'DELETE') {
     try {
-      await prisma.report.delete({
+      await prisma.policeReport.delete({
         where: { id: reportId }
       })
 

@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'GET') {
     try {
-      const warrants = await prisma.warrant.findMany({
+      const warrants = await prisma.policeWarrant.findMany({
         include: {
           officer: true,
           subject: true
@@ -41,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const officerId = parseInt(session.user.id)
       
-      const warrant = await prisma.warrant.create({
+      const warrant = await prisma.policeWarrant.create({
         data: {
           reason,
           description,

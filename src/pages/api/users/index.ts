@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-      const users = await prisma.user.findMany({
+      const users = await prisma.player.findMany({
         where: {
           OR: [
             { citizenid: { contains: query } },

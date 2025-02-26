@@ -15,9 +15,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'GET') {
     try {
       const [totalReports, totalWarrants, totalCitizens, totalVehicles] = await Promise.all([
-        prisma.report.count(),
-        prisma.warrant.count(),
-        prisma.user.count(),
+        prisma.policeReport.count(),
+        prisma.policeWarrant.count(),
+        prisma.player.count(),
         prisma.vehicle.count()
       ])
       

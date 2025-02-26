@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ error: 'Vehicle not found' })
       }
       
-      const owner = await prisma.user.findFirst({
+      const owner = await prisma.player.findFirst({
         where: {
           citizenid: vehicle.citizenid
         }

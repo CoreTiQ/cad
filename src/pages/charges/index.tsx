@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'GET') {
     try {
-      const charges = await prisma.charge.findMany({
+      const charges = await prisma.policeCharge.findMany({
         orderBy: {
           name: 'asc'
         }

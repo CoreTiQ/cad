@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'GET') {
     try {
-      const reports = await prisma.report.findMany({
+      const reports = await prisma.policeReport.findMany({
         include: {
           officer: true,
           subject: true
@@ -41,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const officerId = parseInt(session.user.id)
       
-      const report = await prisma.report.create({
+      const report = await prisma.policeReport.create({
         data: {
           title,
           description,
