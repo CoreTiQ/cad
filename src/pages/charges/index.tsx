@@ -4,10 +4,19 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import axios from 'axios'
 
+// تعريف نوع المخالفة
+type ChargeType = {
+  id: number;
+  name: string;
+  description: string;
+  fine: number;
+  jail_time: number;
+};
+
 export default function Charges() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [charges, setCharges] = useState([])
+  const [charges, setCharges] = useState<ChargeType[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
