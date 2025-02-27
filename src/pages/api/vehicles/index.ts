@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       
       const owner = await prisma.player.findFirst({
         where: {
-          citizenid: vehicle.citizenid
+          id: vehicle.citizenid
         }
       })
       
