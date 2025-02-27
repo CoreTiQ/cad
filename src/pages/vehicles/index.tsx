@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { useForm } from 'react-hook-form'
 
@@ -10,10 +10,28 @@ type SearchFormData = {
   plate: string
 }
 
+type VehicleType = {
+  vehicle: {
+    id: number;
+    plate: string;
+    model: string;
+    state: number;
+    garage: string | null;
+    fuel: number;
+    engine: number;
+    body: number;
+  };
+  owner: {
+    citizenid: string;
+    firstname: string;
+    lastname: string;
+  };
+}
+
 export default function Vehicles() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [vehicleData, setVehicleData] = useState(null)
+  const [vehicleData, setVehicleData] = useState<VehicleType | null>(null)
   const [isSearching, setIsSearching] = useState(false)
   const [error, setError] = useState('')
   const { register, handleSubmit, formState: { errors } } = useForm<SearchFormData>()
@@ -29,7 +47,7 @@ export default function Vehicles() {
       setVehicleData(response.data)
     } catch (error) {
       console.error('Error searching vehicle:', error)
-      if (error.response?.status === 404) {
+      if ((error as AxiosError).response?.status === 404) {
         setError('لم يتم العثور على مركبة بهذا الرقم')
       } else {
         setError('حدث خطأ أثناء البحث')
@@ -102,6 +120,18 @@ export default function Vehicles() {
               </div>
               <div className="card-body">
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">رقم اللوحة</dt>
+                    <dd className="mt-1 text-sm text-gray-900 dark:text-white">{vehicleData.vehicle.plate}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">الموديل</dt>
+                    <dd className="mt-1 text-sm text-gray-900 dark:text-white">{vehicleData.vehicle.model}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">المرآب</dt>
+                    <dd className="mt-1 text-sm text-gray-900 dark:text-white">{vehicleData.vehicle.garage || 'غير متوفر'}</dd>
+                  </div>
                   <div>
                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">الحالة</dt>
                     <dd className="mt-1 text-sm text-gray-900 dark:text-white">
