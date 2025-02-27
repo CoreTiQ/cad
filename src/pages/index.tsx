@@ -6,7 +6,7 @@ import Link from 'next/link'
 import axios from 'axios'
 import { PlusIcon } from '@heroicons/react/24/outline'
 
-// Definir el tipo para las órdenes de arresto
+// Define el tipo para las órdenes de arresto
 type WarrantType = {
   id: number;
   reason: string;
