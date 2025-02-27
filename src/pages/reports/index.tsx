@@ -6,10 +6,26 @@ import Link from 'next/link'
 import axios from 'axios'
 import { PlusIcon } from '@heroicons/react/24/outline'
 
+// Definir el tipo para los reportes
+type ReportType = {
+  id: number;
+  title: string;
+  subject: {
+    firstname: string;
+    lastname: string;
+  };
+  officer: {
+    firstname: string;
+    lastname: string;
+  };
+  created_at: string;
+  status: string;
+};
+
 export default function Reports() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [reports, setReports] = useState([])
+  const [reports, setReports] = useState<ReportType[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
