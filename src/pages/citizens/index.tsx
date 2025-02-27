@@ -10,10 +10,20 @@ type SearchFormData = {
   query: string
 }
 
+// Definir el tipo para los ciudadanos
+type CitizenType = {
+  id: string;
+  citizenid: string;
+  firstname: string;
+  lastname: string;
+  job: string;
+  grade: number;
+}
+
 export default function Citizens() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [searchResults, setSearchResults] = useState([])
+  const [searchResults, setSearchResults] = useState<CitizenType[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const { register, handleSubmit, formState: { errors } } = useForm<SearchFormData>()
 
