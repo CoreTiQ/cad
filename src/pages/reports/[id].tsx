@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'GET') {
     try {
-      const report = const report = await prisma.policeReport.findUnique({
+      const report = await prisma.policeReport.findUnique({
         where: { id: reportId },
         include: {
           officer: true,
